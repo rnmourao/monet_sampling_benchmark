@@ -10,7 +10,7 @@ files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and f[-3:] == 'cs
 
 # create a new csv with less columns from list of csv files
 reduced = open(mypath + 'reduced.csv', 'w')
-fieldnames = ['year', 'month', 'state', 'municipality', 'payee', 'value']
+fieldnames = ['date', 'payee', 'state', 'value']
 writer = csv.DictWriter(reduced, fieldnames=fieldnames)
 
 writer.writeheader()
@@ -19,13 +19,11 @@ for file in files:
     csvfile = codecs.open(mypath + file, 'r', 'iso-8859-1')
     reader = csv.DictReader(csvfile, delimiter='\t', quotechar=' ')
     for row in reader:
-        year = file[:4]
-        month = file[4:6]
+        date = file[:4] + '-' + file[4:6] + '-01'
         state = row.get('UF', '')
-        municipality = row.get('Código SIAFI Município', '')
-        payee = row.get('NIS Favorecido', '')
+        payee = row.get('NIS Favorecido')
         value = row.get('Valor Parcela', '')
-        writer.writerow({'year': year, 'month': month, 'state': state, 'municipality': municipality, 'payee': payee, 'value': value})
+        writer.writerow({'date': date, 'payee': payee, 'state': state, 'value': value})
     csvfile.close()
 
 reduced.close()
