@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# need to be root to execute this script: sudo ./02_load.sh
+
+# change this path
 csvfile=/media/mourao/BACKUP/bolsa_familia/load.csv
 
 # gets monetdb-r docker from repository
