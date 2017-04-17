@@ -9,9 +9,9 @@ mypath = '/media/mourao/BACKUP/bolsa_familia/'
 files = [f for f in listdir(mypath) if isfile(join(mypath, f)) and f[-3:] == 'csv']
 
 # create a new csv with less columns from list of csv files
-reduced = open(mypath + 'reduced.csv', 'w')
+load = open(mypath + 'load.csv', 'w')
 fieldnames = ['date', 'payee', 'state', 'value']
-writer = csv.DictWriter(reduced, fieldnames=fieldnames)
+writer = csv.DictWriter(load, fieldnames=fieldnames)
 
 writer.writeheader()
 for file in files:
@@ -26,4 +26,4 @@ for file in files:
         writer.writerow({'date': date, 'payee': payee, 'state': state, 'value': value})
     csvfile.close()
 
-reduced.close()
+load.close()
