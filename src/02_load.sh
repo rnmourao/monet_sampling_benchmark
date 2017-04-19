@@ -3,8 +3,8 @@
 # need to be root to execute this script: sudo ./02_load.sh
 
 # change this path
-# csvfile=/home/mourao/Documentos/bdm/monet_sampling_benchmark/data
-csvfile=/media/mourao/BACKUP1/bolsa_familia
+csvfile=/home/mourao/Documentos/bdm/monet_sampling_benchmark/data
+# csvfile=/media/mourao/BACKUP1/bolsa_familia
 
 # removes old docker
 echo "removing old docker..."
