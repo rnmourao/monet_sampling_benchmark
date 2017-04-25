@@ -14,7 +14,6 @@ load = open(mypath + 'load.csv', 'w')
 fieldnames = ['date', 'payee', 'state', 'value']
 writer = csv.DictWriter(load, fieldnames=fieldnames)
 
-# writer.writeheader()
 for file in files:
     print(file)
     csvfile = codecs.open(mypath + file, 'r', 'iso-8859-1')
