@@ -4,7 +4,7 @@
 
 # change this path
 #csvfile=/home/mourao/Documentos/bdm/monet_sampling_benchmark/data
-csvfile=/media/mourao/BACKUP1/bolsa_familia
+csvfile=/media/mourao/BACKUP/bolsa_familia
 
 # removes old docker
 echo "removing old docker..."
