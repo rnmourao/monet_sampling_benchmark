@@ -1,5 +1,5 @@
 # Use this script outside the docker. It needs R installed:
-# Rscript 03_ts_sample.R
+# Rscript 04_ts_sample.R
 
 # images' directory 
 img.dir <- "../paper/img/"
@@ -85,6 +85,5 @@ sample.ts("BR")
 
 ##### Time Series per State
 for (i in 1:nrow(states)) {
-  st <- states$state[i]
-  sample.ts(st)
+  sample.ts(states$state[i])
 }
