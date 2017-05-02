@@ -4,7 +4,7 @@
 
 # change this path
 #csvfile=/home/mourao/Documentos/bdm/monet_sampling_benchmark/data
-csvfile=/media/mourao/BACKUP/bolsa_familia
+csvfile=/media/mourao/BACKUP/bolsa_familia/load
 
 # removes old docker
 echo "removing old docker..."
@@ -27,6 +27,9 @@ echo "creating user and password file..."
 echo "user=monetdb\npassword=monetdb" > .monetdb
 docker cp .monetdb monetdb-r:/root/.monetdb
 rm .monetdb
+
+# renames part file to load.csv
+mv "$csvfile/part*.csv" "$csvfile/load.csv"
 
 # copies load.sql into docker
 echo "copying load.sql into docker..."
