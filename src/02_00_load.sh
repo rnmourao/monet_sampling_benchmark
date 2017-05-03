@@ -1,10 +1,11 @@
 #!/bin/sh
 
-# need to be root to execute this script: sudo ./02_00_load.sh
+# needs to be root to execute this script: sudo ./02_00_load.sh
+# uses Docker version 17.03.1-ce, build c6d412e
 
 # change this path
-csvfile=/home/mourao/monet_sampling_benchmark/data
-# csvfile=/media/mourao/BACKUP/bolsa_familia/load
+# csvfile=/home/mourao/monet_sampling_benchmark/data
+csvfile=/media/mourao/BACKUP/bolsa_familia/load
 
 # removes old docker
 echo "removing old docker..."
@@ -18,7 +19,7 @@ docker pull monetdb/monetdb-r-docker
 
 # executes docker and mounts csv file
 echo "starting docker..."
-docker run -d -P --name monetdb-r -v $csvfile:/tmp/data:ro  monetdb/monetdb-r-docker # --cpus="1" --memory="2g"
+docker run -d -P --name monetdb-r --cpus="1" --memory="2g" -v $csvfile:/tmp/data:ro  monetdb/monetdb-r-docker
 
 # copies .monetdb into docker
 echo "creating user and password file..."
