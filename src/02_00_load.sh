@@ -8,10 +8,11 @@
 csvfile=/media/mourao/BACKUP/bolsa_familia/load
 
 # removes old docker
-echo "removing old docker..."
-docker stop monetdb-r
-id=$(docker ps -a | grep monetdb | cut -c-3)
-docker rm $id
+echo "removing old dockers..."
+docker rm -f $(docker ps -a | grep monetdb-r-docker | cut -c-3)
+# docker stop monetdb-r
+# id=$(docker ps -a | grep monetdb | cut -c-3)
+# docker rm $id
 
 # gets monetdb-r docker from repository
 echo "getting latest docker version from repository..."
