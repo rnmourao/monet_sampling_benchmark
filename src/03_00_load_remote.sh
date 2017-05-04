@@ -4,8 +4,8 @@
 # uses Docker version 17.03.1-ce, build c6d412e
 
 # change this path
-# csvfile=/home/mourao/monet_sampling_benchmark/data
-csvfile=/media/mourao/BACKUP/bolsa_familia/load
+csvfile=/home/f8676628/monet_sampling_benchmark/data
+# csvfile=/media/mourao/BACKUP/bolsa_familia/load
 
 # remove old docker
 echo '## REMOVING OLD DOCKERS ##'
@@ -26,7 +26,7 @@ mv $csvfile/part*.csv $csvfile/load.csv
 
 # split load.csv into 7 files, one for each year.
 echo '## SPLITTING LOAD FILE INTO SEVERAL FILES, ONE FOR EACH YEAR ##'
-## awk -F, '{print > "'$csvfile'/"substr($2,1,4)".csv"}' $csvfile/load.csv
+awk -F, '{print > "'$csvfile'/"substr($2,1,4)".csv"}' $csvfile/load.csv
 
 # create workers
 echo '## CREATING WORKERS ##'
@@ -46,7 +46,7 @@ for i in $( ls -1 $csvfile/20*.csv | grep -o '.\{8\}$' | cut -d. -f1 ); do
 
   # copies load.sql into docker
   echo '## COPYING DDL SCRIPT INTO WORKER ##'
-  docker cp /home/mourao/monet_sampling_benchmark/src/03_01_load.sql $name:/tmp/03_01_load.sql
+  docker cp 03_01_load.sql $name:/tmp/03_01_load.sql
 
   # change the filename within the load.sql file
   echo '## ADAPTING DDL SCRIPT TO WORKER ##'
