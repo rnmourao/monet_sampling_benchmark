@@ -4,7 +4,7 @@
 # uses Docker version 17.03.1-ce, build c6d412e
 
 # change this path
-csvfile=/home/f8676628/monet_sampling_benchmark/data
+csvfile=/home/mourao/monet_sampling_benchmark/data
 # csvfile=/media/mourao/BACKUP/bolsa_familia/load
 
 # remove old docker
@@ -31,7 +31,7 @@ awk -F, '{print > "'$csvfile'/"substr($2,1,4)".csv"}' $csvfile/load.csv
 # create workers
 echo '## CREATING WORKERS ##'
 for i in $( ls -1 $csvfile/20*.csv | grep -o '.\{8\}$' | cut -d. -f1 ); do
-  name=MONETDB-$i
+  name=monetdb-$i
 
   # executes docker and mounts csv file
   echo '## STARTING WORKER '$name' ##'
@@ -57,15 +57,30 @@ for i in $( ls -1 $csvfile/20*.csv | grep -o '.\{8\}$' | cut -d. -f1 ); do
   docker exec $name mclient -d db -i /tmp/03_01_load.sql
 done
 
+#### create master
+echo '## CREATING MASTER DB ##'
+docker run -d -P --name monetdb-master --cpus='1' --memory='2g' monetdb/monetdb-r-docker
+
+echo '## WAITING ##'
+sleep 30
+
+# copy .monetdb into docker
+echo '## COPYING CREDENTIALS FILE ##'
+docker cp .monetdb monetdb-master:/root/.monetdb
+
+# copies load.sql into docker
+echo '## COPYING DDL SCRIPT INTO MASTER ##'
+docker cp 03_02_load.sql monetdb-master:/tmp/03_02_load.sql
+
+# executes load.sql
+echo '## EXECUTING DDL SCRIPT ##'
+docker exec monetdb-master mclient -d db -i /tmp/03_02_load.sql
+
 # delete .monetdb file
 echo '## REMOVING ORIGINAL CREDENTIALS FILE ##'
 rm .monetdb
 
 echo 'done.'
-
-# create master
-
-
 
 # ./02_00_load.sh
 # docker rename monetdb-r monetdb-r-w1
