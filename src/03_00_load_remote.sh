@@ -30,10 +30,16 @@ awk -F, '{print > "'$csvfile'/"substr($2,1,4)".csv"}' $csvfile/load.csv
 
 # create workers
 echo '## CREATING WORKERS ##'
+link=""
 for i in $( ls -1 $csvfile/20*.csv | grep -o '.\{8\}$' | cut -d. -f1 ); do
   name=monetdb-$i
+  link="$link --link $name:$name"
 
-  # executes docker and mounts csv file
+  # create temp file with remote table statement
+  echo "CREATE REMOTE TABLE t$i (state char(2), p_date date, payee bigint, value decimal(7,2), log_value decimal(18,16)) on 'mapi:monetdb://$name:50000/db';" >> temp
+  echo "ALTER TABLE payments ADD TABLE t$i;" >> temp
+
+  # execute docker and mounts csv file
   echo '## STARTING WORKER '$name' ##'
   docker run -d -P --name $name --cpus='1' --memory='2g' -v $csvfile:/tmp/data:ro  monetdb/monetdb-r-docker
 
@@ -44,7 +50,7 @@ for i in $( ls -1 $csvfile/20*.csv | grep -o '.\{8\}$' | cut -d. -f1 ); do
   echo '## COPYING CREDENTIALS FILE ##'
   docker cp .monetdb $name:/root/.monetdb
 
-  # copies load.sql into docker
+  # copy load.sql into docker
   echo '## COPYING DDL SCRIPT INTO WORKER ##'
   docker cp 03_01_load.sql $name:/tmp/03_01_load.sql
 
@@ -52,14 +58,15 @@ for i in $( ls -1 $csvfile/20*.csv | grep -o '.\{8\}$' | cut -d. -f1 ); do
   echo '## ADAPTING DDL SCRIPT TO WORKER ##'
   docker exec $name sed -i 's/@YEAR@/'$i'/g' /tmp/03_01_load.sql
 
-  # executes load.sql
+  # execute load.sql
   echo '## EXECUTING DDL SCRIPT ##'
   docker exec $name mclient -d db -i /tmp/03_01_load.sql
 done
 
 #### create master
 echo '## CREATING MASTER DB ##'
-docker run -d -P --name monetdb-master --cpus='1' --memory='2g' monetdb/monetdb-r-docker
+echo $link
+docker run -d -P --name monetdb-master $link --cpus='1' --memory='2g' monetdb/monetdb-r-docker
 
 echo '## WAITING ##'
 sleep 30
@@ -68,43 +75,23 @@ sleep 30
 echo '## COPYING CREDENTIALS FILE ##'
 docker cp .monetdb monetdb-master:/root/.monetdb
 
-# copies load.sql into docker
+# copy load.sql into docker
 echo '## COPYING DDL SCRIPT INTO MASTER ##'
 docker cp 03_02_load.sql monetdb-master:/tmp/03_02_load.sql
 
-# executes load.sql
+# copy temp file into docker
+docker cp temp monetdb-master:/tmp/temp
+
+# join the two files
+docker exec monetdb-master bash -c "cd tmp && sed -i '/REMOTE TABLES/r temp' 03_02_load.sql"
+
+# execute load.sql
 echo '## EXECUTING DDL SCRIPT ##'
 docker exec monetdb-master mclient -d db -i /tmp/03_02_load.sql
 
 # delete .monetdb file
-echo '## REMOVING ORIGINAL CREDENTIALS FILE ##'
+echo '## REMOVING TEMPORARY FILES ##'
 rm .monetdb
+rm temp
 
 echo 'done.'
-
-# ./02_00_load.sh
-# docker rename monetdb-r monetdb-r-w1
-#
-# # create worker 2
-# docker run -d -P --name monetdb-r-w2 --cpus="1" --memory="2g" monetdb/monetdb-r-docker
-#
-# # create master
-# docker run -d -P --name monetdb-r-master --cpus="1" --memory="2g" monetdb/monetdb-r-docker
-#
-# # stop workers 1 and 2
-# docker exec monetdb-r-w1 monetdb stop db
-# docker exec monetdb-r-w2 monetdb stop db
-#
-# # set passphrase
-# docker exec monetdb-r-w1 monetdb set passphrase=senha db
-# docker exec monetdb-r-w2 monetdb set passphrase=senha db
-#
-# # share databases
-# docker exec monetdb-r-w1 monetdb set shared=db/1/fox db
-# docker exec monetdb-r-w2 monetdb set shared=db/2/fox db
-#
-# # start workers 1 and 2
-# docker exec monetdb-r-w1 monetdb start db
-# docker exec monetdb-r-w2 monetdb start db
-#
-# echo "done."
