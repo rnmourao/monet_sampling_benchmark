@@ -95,4 +95,4 @@ rm temp
 
 port=$(docker ps | grep master | cut -d':' -f2 | cut -d'-' -f1)
 
-echo 'DONE. MONETDB AVAILABLE ON LOCALHOST:'$port
+echo '## DONE. MONETDB AVAILABLE ON LOCALHOST:'$port '##'

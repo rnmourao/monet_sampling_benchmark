@@ -48,17 +48,3 @@ df.select([F.mean('value'), F.stddev_pop('value'), \
 print('Statistics about log(value):')
 df.select([F.mean('log_value'), F.stddev_pop('log_value'), \
            F.skewness('log_value'), F.kurtosis('log_value')]).show()
-
-# plot histograms
-n_bins = 20
-fig, axes = plt.subplots(nrows=1, ncols=2)
-ax0, ax1 = axes.flatten()
-
-ax0.hist(df.toPandas()['value'], n_bins)
-ax0.set_title('value')
-
-ax1.hist(df.toPandas()['log_value'], n_bins)
-ax1.set_title('log(value)')
-
-fig.tight_layout()
-plt.savefig("../paper/img/hist.pdf")
