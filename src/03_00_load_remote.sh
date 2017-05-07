@@ -36,8 +36,7 @@ for i in $( ls -1 $csvfile/20*.csv | grep -o '.\{8\}$' | cut -d. -f1 ); do
   link="$link --link $name:$name"
 
   # create temp file with remote table statement
-  echo "CREATE REMOTE TABLE t$i (state char(2), p_date date, payee bigint, value decimal(7,2), log_value decimal(18,16)) on 'mapi:monetdb://$name:50000/db';" >> temp
-  echo "ALTER TABLE payments ADD TABLE t$i;" >> temp
+  sed 's/@YEAR@/'$i'/g' 03_03_load.sql >> temp
 
   # execute docker and mounts csv file
   echo '## STARTING WORKER '$name' ##'
@@ -94,4 +93,6 @@ echo '## REMOVING TEMPORARY FILES ##'
 rm .monetdb
 rm temp
 
-echo 'done.'
+port=$(docker ps | grep master | cut -d':' -f2 | cut -d'-' -f1)
+
+echo 'DONE. MONETDB AVAILABLE ON LOCALHOST:'$port
