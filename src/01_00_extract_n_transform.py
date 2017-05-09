@@ -2,8 +2,8 @@
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
 from pyspark.sql import functions as F
-import matplotlib.pyplot as plt
-import pandas as pd
+from pyspark.sql import types as T
+from datetime import datetime
 
 # csv files' path
 mypath = '/media/mourao/BACKUP/bolsa_familia/'
@@ -14,6 +14,7 @@ sc = SparkContext('local','example')
 spark = SparkSession(sc)
 
 # join all csv files in a unique dataframe.
+print('## READ CSV FILE ##')
 df = spark.read.format('csv') \
     .option('charset', 'iso-8859-1') \
     .option('sep', '\t') \
@@ -22,29 +23,44 @@ df = spark.read.format('csv') \
     .withColumn('filename', F.input_file_name())
 
 # extract date
-df = df.withColumn('pdate', F.concat(F.regexp_extract(df.filename, '\d{4}', 0), \
+df = df.withColumn('pdate', F.date_format(F.concat(F.regexp_extract(df.filename, '\d{4}', 0), \
                                      F.lit('-'), \
                                      F.regexp_extract(df.filename, '(\d{2})(?!.*\d)', 0), \
-                                     F.lit('-01')))
+                                     F.lit('-01')), 'yyyy-MM-dd'))
 
 # create double column 'value' from 'Valor Parcela'
+print('## CREATE VALUE COLUMN ##')
 df = df.withColumn('value', df['Valor Parcela'].cast('double'))
 
-# create a log-transformed column of value
-df = df.withColumn('log_value', F.log(10.0, df['value']))
+print('## GET MIN AND MAX DATE PER ID ##')
+df.createOrReplaceTempView("table1")
+df2 = spark.sql("SELECT nis, min(pdate) as min_pdate, max(pdate) as max_pdate from table1 group by nis")
+df = df.join(df2, 'nis', 'inner')
 
-### save csv
-df2 = df.select('UF', 'pdate', 'NIS Favorecido', 'value', 'log_value')
-df2.repartition(1) \
+def is_newcomer(pdate, min_pdate):
+    if pdate == min_pdate:
+        return 1
+    else:
+        return 0
+
+is_newcomer_udf = F.udf(is_newcomer, T.IntegerType())
+df = df.withColumn('newcomer', is_newcomer_udf(df.pdate, df.min_pdate))
+
+def is_freshout(pdate, max_pdate):
+    if pdate == max_pdate:
+        return 1
+    else:
+        return 0
+
+is_freshout_udf = F.udf(is_freshout, T.IntegerType())
+df = df.withColumn('freshout', is_freshout_udf(df.pdate, df.max_pdate))
+
+# save csv
+print('## SAVE NEW CSV FILE ##')
+out = df.select('UF', 'pdate', 'NIS Favorecido', 'value', 'newcomer', 'freshout')
+out.repartition(1) \
 .write \
 .format("com.databricks.spark.csv") \
 .save(mypath + 'load')
 
-# statistics from population
-print('Statistics about value:')
-df.select([F.mean('value'), F.stddev_pop('value'), \
-           F.skewness('value'), F.kurtosis('value')]).show()
-
-print('Statistics about log(value):')
-df.select([F.mean('log_value'), F.stddev_pop('log_value'), \
-           F.skewness('log_value'), F.kurtosis('log_value')]).show()
+print('## DONE. ' + str(datetime.now()) + ' ##' )

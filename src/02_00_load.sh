@@ -4,8 +4,8 @@
 # uses Docker version 17.03.1-ce, build c6d412e
 
 # change this path
-csvfile=/home/mourao/monet_sampling_benchmark/data
-# csvfile=/media/mourao/BACKUP/bolsa_familia/load
+# csvfile=/home/mourao/monet_sampling_benchmark/data
+csvfile=/media/mourao/BACKUP/bolsa_familia/load/load2
 
 # remove old docker
 echo "## REMOVING OLD DOCKERS ##"
