@@ -2,7 +2,7 @@
 # Rscript 04_ts_all.R
 
 # port to connect with MonetDB
-p=32771
+p=32774
 
 # images' directory
 img.dir <- "../paper/img/"
@@ -25,18 +25,18 @@ query.ts <- function (name) {
 
   b <- Sys.time()
   if (name == "BR") {
-    query <- paste("SELECT payment_date,",
+    query <- paste("SELECT p_date,",
                    "AVG(value) AS mean",
                    "FROM payments",
-                   "GROUP BY payment_date",
-                   "ORDER BY payment_date")
+                   "GROUP BY p_date",
+                   "ORDER BY p_date")
   } else {
-    query <- paste0("SELECT payment_date,",
+    query <- paste0("SELECT p_date,",
                     "AVG(value) AS mean",
                     " FROM payments",
                     " WHERE state = '", name, "'",
-                    " GROUP BY payment_date",
-                    " ORDER BY payment_date")
+                    " GROUP BY p_date",
+                    " ORDER BY p_date")
   }
 
     mydf <- mq(host="localhost", port=p, dbname="db", user="monetdb",
@@ -45,18 +45,18 @@ query.ts <- function (name) {
 
   # gets standard deviation to create confidence intervals
   if (name == "BR") {
-    query <- paste("SELECT payment_date,",
+    query <- paste("SELECT p_date,",
                    "STDDEV_POP(value) AS mean",
                    "FROM payments",
-                   "GROUP BY payment_date",
-                   "ORDER BY payment_date")
+                   "GROUP BY p_date",
+                   "ORDER BY p_date")
   } else {
-    query <- paste0("SELECT payment_date,",
+    query <- paste0("SELECT p_date,",
                     "STDDEV_POP(value) AS mean",
                     " FROM payments",
                     " WHERE state = '", name, "'",
-                    " GROUP BY payment_date",
-                    " ORDER BY payment_date")
+                    " GROUP BY p_date",
+                    " ORDER BY p_date")
   }
   mysd <- mq(host="localhost", port=p, dbname="db", user="monetdb",
              password="monetdb", query)
@@ -89,3 +89,19 @@ states <- mq(host="localhost", port=p, dbname="db", user="monetdb", password="mo
 for (i in 1:nrow(states)) {
   query.ts(states$state[i])
 }
+
+
+# RANDOM SAMPLE BR - Time difference of 9.9031 mins
+t1=Sys.time()
+bd_random <- mq(host="localhost",  port=p, dbname="db", user="monetdb", 
+                password="monetdb", query="SELECT * FROM payments sample 1347")
+Sys.time()-t1
+
+# RANDOM SAMPLE BY UF - Time difference of 12.36119 mins
+t1=Sys.time()
+bd_random.estr <- mq(dbname="db",  port=p, user="monetdb", 
+                     password="monetdb", query="SELECT * FROM payments sample 392080")
+Sys.time()-t1
+
+save(bd_random, file = paste0(data.dir,"bd_random.RData"))
+save(bd_random.estr, file = paste0(data.dir,"bd_random.strat.RData"))
