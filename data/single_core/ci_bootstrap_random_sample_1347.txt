@@ -1,0 +1,10 @@
+BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+Based on 1000 bootstrap replicates
+
+CALL : 
+boot.ci(boot.out = boot.mean, type = "norm")
+
+Intervals : 
+Level      Normal        
+95%   (145.0, 154.1 )  
+Calculations and Intervals on Original Scale

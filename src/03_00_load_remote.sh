@@ -4,8 +4,7 @@
 # uses Docker version 17.03.1-ce, build c6d412e
 
 # change this path
-csvfile=/media/mourao/BACKUP/bolsa_familia/load/load2
-# csvfile=/media/mourao/BACKUP/bolsa_familia/load
+csvfile=/media/mourao/BACKUP/bolsa_familia/load
 
 # remove old docker
 echo '## REMOVING OLD DOCKERS ##'
@@ -26,7 +25,7 @@ mv $csvfile/part*.csv $csvfile/load.csv
 
 # split load.csv into 7 files, one for each year.
 echo '## SPLITTING LOAD FILE INTO SEVERAL FILES, ONE FOR EACH YEAR ##'
-awk -F, '{print > "'$csvfile'/"substr($2,1,4)".csv"}' $csvfile/load.csv
+# awk -F, '{print > "'$csvfile'/"substr($2,1,4)".csv"}' $csvfile/load.csv
 
 # create workers
 echo '## CREATING WORKERS ##'
@@ -95,4 +94,4 @@ rm temp
 
 port=$(docker ps | grep master | cut -d':' -f2 | cut -d'-' -f1)
 
-echo '## DONE. MONETDB AVAILABLE ON LOCALHOST:'$port '##'
+echo '## DONE. MONETDB AVAILABLE ON LOCALHOST:' $port '##'

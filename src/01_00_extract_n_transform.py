@@ -6,8 +6,8 @@ from pyspark.sql import types as T
 from datetime import datetime
 
 # csv files' path
-mypath = '/media/mourao/BACKUP/bolsa_familia/'
-# mypath = '/media/mourao/BACKUP/bolsa_familia/test/'
+mypath = '/media/mourao/BACKUP/bolsa_familia/test/'
+# mypath = '/media/mourao/BACKUP/bolsa_familia/'
 
 # create SparkContext and SparkSession to process files
 sc = SparkContext('local','example')
@@ -34,8 +34,11 @@ df = df.withColumn('value', df['Valor Parcela'].cast('double'))
 
 print('## GET MIN AND MAX DATE PER ID ##')
 df.createOrReplaceTempView("table1")
-df2 = spark.sql("SELECT nis, min(pdate) as min_pdate, max(pdate) as max_pdate from table1 group by nis")
-df = df.join(df2, 'nis', 'inner')
+df2 = spark.sql("SELECT `NIS Favorecido`, \
+                        min(pdate) as min_pdate, \
+                        max(pdate) as max_pdate  \
+                        from table1 group by `NIS Favorecido`")
+df = df.join(df2, 'NIS Favorecido', 'inner')
 
 def is_newcomer(pdate, min_pdate):
     if pdate == min_pdate:

@@ -4,8 +4,7 @@
 # uses Docker version 17.03.1-ce, build c6d412e
 
 # change this path
-# csvfile=/home/mourao/monet_sampling_benchmark/data
-csvfile=/media/mourao/BACKUP/bolsa_familia/load/load2
+csvfile=/media/mourao/BACKUP/bolsa_familia/load
 
 # remove old docker
 echo "## REMOVING OLD DOCKERS ##"
@@ -41,4 +40,4 @@ docker exec monetdb-r mclient -d db -i /tmp/02_01_load.sql
 
 port=$(docker ps | grep monetdb-r | cut -d':' -f2 | cut -d'-' -f1)
 
-echo '## DONE. MONETDB AVAILABLE ON LOCALHOST:'$port '##'
+echo '## DONE. MONETDB AVAILABLE ON LOCALHOST:' $port '##'

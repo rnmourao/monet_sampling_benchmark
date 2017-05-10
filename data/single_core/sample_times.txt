@@ -1,0 +1,2 @@
+SAMPLE of   1.347: Time difference of 5.290948 mins
+SAMPLE of 392.080: Time difference of 8.059138 mins

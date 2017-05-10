@@ -2,7 +2,7 @@
 # Rscript 04_ts_all.R
 
 # port to connect with MonetDB
-p=32774
+p=32785
 
 # images' directory
 img.dir <- "../paper/img/"
@@ -69,12 +69,14 @@ query.ts <- function (name) {
   myts <- ts(mydf$mean, start=c(2011, 1), end=c(2017, 2), frequency=12)
 
   # saves a time series plot
-  pdf(paste0(img.dir, name, "_pop.pdf"))
+  pdf(paste0(name, "_pop.pdf"))
     plot(myts)
   ignore <- dev.off()
 
   # saves data frame
   write.csv(mydf, paste0(data.dir, name, "_pop.csv"), row.names=FALSE)
+  
+  # return(myts)
 }
 
 ##### Full Time Series #####
@@ -91,15 +93,15 @@ for (i in 1:nrow(states)) {
 }
 
 
-# RANDOM SAMPLE BR - Time difference of 9.9031 mins
+# RANDOM SAMPLE BR
 t1=Sys.time()
-bd_random <- mq(host="localhost",  port=p, dbname="db", user="monetdb", 
+bd_random <- mq(host="localhost",  port=p, dbname="db", user="monetdb",
                 password="monetdb", query="SELECT * FROM payments sample 1347")
 Sys.time()-t1
 
-# RANDOM SAMPLE BY UF - Time difference of 12.36119 mins
+# RANDOM SAMPLE BY UF
 t1=Sys.time()
-bd_random.estr <- mq(dbname="db",  port=p, user="monetdb", 
+bd_random.estr <- mq(dbname="db",  port=p, user="monetdb",
                      password="monetdb", query="SELECT * FROM payments sample 392080")
 Sys.time()-t1
 
