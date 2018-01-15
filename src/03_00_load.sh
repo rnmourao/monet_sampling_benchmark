@@ -25,9 +25,6 @@ echo "password=monetdb" >> .monetdb
 docker cp .monetdb monetdb-r:/root/.monetdb
 rm .monetdb
 
-# rename part file to load.csv
-mv $csvfile/part*.csv $csvfile/load.csv
-
 # copy load.sql into docker
 echo '## COPYING DDL SCRIPT INTO DOCKER ##'
 docker cp /home/mourao/monet_sampling_benchmark/src/02_01_load.sql monetdb-r:/tmp/02_01_load.sql

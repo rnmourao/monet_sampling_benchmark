@@ -58,12 +58,16 @@ def is_freshout(pdate, max_pdate):
 is_freshout_udf = F.udf(is_freshout, T.IntegerType())
 df = df.withColumn('freshout', is_freshout_udf(df.pdate, df.max_pdate))
 
-# save csv
+# save data csv
 print('## SAVE NEW CSV FILE ##')
-out = df.select('UF', 'pdate', 'NIS Favorecido', 'value', 'newcomer', 'freshout')
+out = df.select('UF', 'pdate', 'NIS Favorecido', 'value', 'newcomer', 'freshout').orderBy(['UF', 'pdate', 'NIS Favorecido'])
 out.repartition(1) \
 .write \
 .format("com.databricks.spark.csv") \
 .save(mypath + 'load')
+
+# create file with ids
+with open(mypath + 'ids.txt', mode='w') as myfile:
+    myfile.write('\n'.join([str(i + 1) for i in range(df.count())]))
 
 print('## DONE. ' + str(datetime.now()) + ' ##' )

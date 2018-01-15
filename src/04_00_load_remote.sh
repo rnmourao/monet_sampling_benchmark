@@ -19,10 +19,6 @@ echo '## CREATING CREDENTIALS FILE ##'
 echo 'user=monetdb' > .monetdb
 echo 'password=monetdb' >> .monetdb
 
-# rename part file to load.csv
-echo '## CHANGING NAME OF OLD LOAD FILE ##'
-mv $csvfile/part*.csv $csvfile/load.csv
-
 # split load.csv into 7 files, one for each year.
 echo '## SPLITTING LOAD FILE INTO SEVERAL FILES, ONE FOR EACH YEAR ##'
 # awk -F, '{print > "'$csvfile'/"substr($2,1,4)".csv"}' $csvfile/load.csv
