@@ -6,8 +6,8 @@ from pyspark.sql import types as T
 from datetime import datetime
 
 # csv files' path
-mypath = '/media/mourao/BACKUP/bolsa_familia/test/'
-# mypath = '/media/mourao/BACKUP/bolsa_familia/'
+# mypath = '/media/mourao/BACKUP/bolsa_familia/test/'
+mypath = '/media/mourao/BACKUP/bolsa_familia/'
 
 # create SparkContext and SparkSession to process files
 sc = SparkContext('local','example')
@@ -67,7 +67,13 @@ out.repartition(1) \
 .save(mypath + 'load')
 
 # create file with ids
-with open(mypath + 'ids.txt', mode='w') as myfile:
-    myfile.write('\n'.join([str(i + 1) for i in range(df.count())]))
+number_of_records = df.count()
+with open('ids.txt', mode='w') as myfile:
+    i = 1
+    while True:
+        myfile.write(str(i) + '\n')
+        i += 1
+        if i > number_of_records:
+            break
 
 print('## DONE. ' + str(datetime.now()) + ' ##' )

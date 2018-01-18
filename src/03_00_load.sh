@@ -27,13 +27,13 @@ rm .monetdb
 
 # copy load.sql into docker
 echo '## COPYING DDL SCRIPT INTO DOCKER ##'
-docker cp /home/mourao/monet_sampling_benchmark/src/02_01_load.sql monetdb-r:/tmp/02_01_load.sql
+docker cp /home/mourao/monet_sampling_benchmark/src/03_01_load.sql monetdb-r:/tmp/03_01_load.sql
 
 sleep 30
 
 # execute load.sql
 echo '## EXECUTING DDL SCRIPT ##'
-docker exec monetdb-r mclient -d db -i /tmp/02_01_load.sql
+docker exec monetdb-r mclient -d db -i /tmp/03_01_load.sql
 
 port=$(docker ps | grep monetdb-r | cut -d':' -f2 | cut -d'-' -f1)
 

@@ -31,7 +31,7 @@ for i in $( ls -1 $csvfile/20*.csv | grep -o '.\{8\}$' | cut -d. -f1 ); do
   link="$link --link $name:$name"
 
   # create temp file with remote table statement
-  sed 's/@YEAR@/'$i'/g' 03_03_load.sql >> temp
+  sed 's/@YEAR@/'$i'/g' 04_03_load.sql >> temp
 
   # execute docker and mounts csv file
   echo '## STARTING WORKER '$name' ##'
@@ -46,15 +46,15 @@ for i in $( ls -1 $csvfile/20*.csv | grep -o '.\{8\}$' | cut -d. -f1 ); do
 
   # copy load.sql into docker
   echo '## COPYING DDL SCRIPT INTO WORKER ##'
-  docker cp 03_01_load.sql $name:/tmp/03_01_load.sql
+  docker cp 04_01_load.sql $name:/tmp/04_01_load.sql
 
   # change the filename within the load.sql file
   echo '## ADAPTING DDL SCRIPT TO WORKER ##'
-  docker exec $name sed -i 's/@YEAR@/'$i'/g' /tmp/03_01_load.sql
+  docker exec $name sed -i 's/@YEAR@/'$i'/g' /tmp/04_01_load.sql
 
   # execute load.sql
   echo '## EXECUTING DDL SCRIPT ##'
-  docker exec $name mclient -d db -i /tmp/03_01_load.sql
+  docker exec $name mclient -d db -i /tmp/04_01_load.sql
 done
 
 #### create master
@@ -71,17 +71,17 @@ docker cp .monetdb monetdb-master:/root/.monetdb
 
 # copy load.sql into docker
 echo '## COPYING DDL SCRIPT INTO MASTER ##'
-docker cp 03_02_load.sql monetdb-master:/tmp/03_02_load.sql
+docker cp 04_02_load.sql monetdb-master:/tmp/04_02_load.sql
 
 # copy temp file into docker
 docker cp temp monetdb-master:/tmp/temp
 
 # join the two files
-docker exec monetdb-master bash -c "cd tmp && sed -i '/REMOTE TABLES/r temp' 03_02_load.sql"
+docker exec monetdb-master bash -c "cd tmp && sed -i '/REMOTE TABLES/r temp' 04_02_load.sql"
 
 # execute load.sql
 echo '## EXECUTING DDL SCRIPT ##'
-docker exec monetdb-master mclient -d db -i /tmp/03_02_load.sql
+docker exec monetdb-master mclient -d db -i /tmp/04_02_load.sql
 
 # delete .monetdb file
 echo '## REMOVING TEMPORARY FILES ##'
