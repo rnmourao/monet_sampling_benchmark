@@ -21,7 +21,7 @@ echo 'password=monetdb' >> .monetdb
 
 # split load.csv into 7 files, one for each year.
 echo '## SPLITTING LOAD FILE INTO SEVERAL FILES, ONE FOR EACH YEAR ##'
-# awk -F, '{print > "'$csvfile'/"substr($2,1,4)".csv"}' $csvfile/load.csv
+awk -F, '{print > "'$csvfile'/"substr($2,1,4)".csv"}' $csvfile/load.csv
 
 # create workers
 echo '## CREATING WORKERS ##'

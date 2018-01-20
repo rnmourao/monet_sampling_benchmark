@@ -7,7 +7,7 @@ csvfile=/media/mourao/BACKUP/bolsa_familia
 # csvfile=/media/mourao/BACKUP/bolsa_familia/test
 
 # join files
-paste -d',' $csvfile/ids.txt $csvfile/load/part*.csv > $csvfile/load/load.csv
-rm $csvfile/ids.txt $csvfile/load/part*.csv
+paste -d',' $csvfile/load/part*.csv $csvfile/ids.txt > $csvfile/load/load.csv
+# rm $csvfile/ids.txt $csvfile/load/part*.csv
 
 echo '## DONE. ##'

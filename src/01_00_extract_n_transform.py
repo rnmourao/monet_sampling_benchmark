@@ -60,7 +60,7 @@ df = df.withColumn('freshout', is_freshout_udf(df.pdate, df.max_pdate))
 
 # save data csv
 print('## SAVE NEW CSV FILE ##')
-out = df.select('UF', 'pdate', 'NIS Favorecido', 'value', 'newcomer', 'freshout').orderBy(['UF', 'pdate', 'NIS Favorecido'])
+out = df.select('UF', 'pdate', 'NIS Favorecido', 'value', 'newcomer', 'freshout').orderBy(['UF', 'pdate'])
 out.repartition(1) \
 .write \
 .format("com.databricks.spark.csv") \
@@ -68,7 +68,7 @@ out.repartition(1) \
 
 # create file with ids
 number_of_records = df.count()
-with open('ids.txt', mode='w') as myfile:
+with open(mypath + 'ids.txt', mode='w') as myfile:
     i = 1
     while True:
         myfile.write(str(i) + '\n')
